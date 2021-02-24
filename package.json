@@ -1,0 +1,24 @@
+{
+  "name": "weechat-relay-client",
+  "version": "0.1.0",
+  "description": "Client and Types for the Weechat Relay Protocol",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mutantmell/weechat-relay-client.git"
+  },
+  "keywords": [
+    "Weechat",
+    "Relay"
+  ],
+  "author": "Matt Mullen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mutantmell/weechat-relay-client/issues"
+  },
+  "homepage": "https://github.com/mutantmell/weechat-relay-client#readme"
+}

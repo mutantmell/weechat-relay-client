@@ -1,0 +1,1 @@
+export {Weechat} from './client'
