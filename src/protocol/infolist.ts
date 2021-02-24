@@ -4,7 +4,7 @@ export interface Infolist {
     pointer?: string;
 }
 
-export function format(i: Infolist) {
+export function format(i: Infolist): string {
     var args = [i.value];
     if (i.pointer) {
         args.push(i.pointer);

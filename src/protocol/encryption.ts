@@ -18,7 +18,7 @@ function exhaustive(never: never) {
     throw new Error('inexhaustive match on Encryption');
 }
 
-export function format(e: Encryption) {
+export function format(e: Encryption): string {
     switch (e.type) {
         case 'hash': return e.hash;
         case 'hash-key': return `${e.hash}-${e.keyDerivation}`;

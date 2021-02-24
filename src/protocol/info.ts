@@ -3,6 +3,6 @@ export interface Info {
     value: string;
 }
 
-export function format(i: Info) {
+export function format(i: Info): string {
     return `info ${i.value}`;
 }

@@ -1,8 +1,13 @@
+import * as Reference from "./reference";
+
 export type Count = number | '*'
 
-export interface Pointer {
-    name: string
-    count?: Count
+function formatCount(c: Count): string {
+    if (c === '*') {
+        return '(*)';
+    } else {
+        return `(${c})`;
+    }
 }
 
 export interface Var {
@@ -12,7 +17,8 @@ export interface Var {
 
 export interface Path {
     name: string
-    pointer: Pointer
+    pointer: Reference.Reference
+    count?: Count
     vars: [Var]
 }
 
@@ -22,12 +28,16 @@ export interface HData {
     keys?: [string, ...string[]];
 }
 
-export function format(h: HData) {
+export function format(h: HData): string {
     const args = [];
 
-    args.push(`${h.path.name}:${h.path.pointer}`);
-    if (h.path.pointer.count) {
-        args.push(formatCount(h.path.pointer.count));
+    args.push(
+        h.path.name,
+        ':',
+        Reference.format(h.path.pointer)
+    );
+    if (h.path.count) {
+        args.push(formatCount(h.path.count));
     }
     h.path.vars.forEach((v) => {
         args.push(`/${v.name}`);
@@ -44,12 +54,4 @@ export function format(h: HData) {
     }
 
     return `hdata ${args.join()}`;
-}
-
-function formatCount(c: Count) {
-    if (c === '*') {
-        return '(*)';
-    } else {
-        return `(${c})`;
-    }
 }

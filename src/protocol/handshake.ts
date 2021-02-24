@@ -11,7 +11,7 @@ export interface Handshake {
     compression?: Compression;
 }
 
-export function format(h: Handshake) {
+export function format(h: Handshake): string {
     const args = [];
 
     if (h.passwordHashAlgorithm === 'plain') {

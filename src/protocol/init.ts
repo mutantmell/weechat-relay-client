@@ -32,11 +32,11 @@ export interface Init {
     totp?: string
 }
 
-function escape(s: string) {
+function escape(s: string): string {
     return s.replace(",", "\\,");
 }
 
-export function format(i: Init) {
+export function format(i: Init): string {
     const args = [];
     switch (i.password.type) {
         case 'password':
