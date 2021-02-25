@@ -1,3 +1,4 @@
+import * as Completion from './completion';
 import * as Handshake from './handshake';
 import * as HData from './hdata';
 import * as Init from './init';
@@ -13,7 +14,8 @@ export type Command =
   Info.Info |
   Infolist.Infolist |
   Nicklist.Nicklist |
-  Input.Input
+  Input.Input |
+  Completion.Completion
 
 function exhaustive(never: never) {
     throw new Error('inexhaustive match on Command');
@@ -35,6 +37,8 @@ export function format(c: Command): string {
             return Nicklist.format(c);
         case 'input':
             return Input.format(c);
+        case 'completion':
+            return Completion.format(c);
         default:
             exhaustive(c);
     }
