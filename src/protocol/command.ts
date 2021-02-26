@@ -6,6 +6,7 @@ import * as Info from './info';
 import * as Infolist from './infolist';
 import * as Input from './input';
 import * as Nicklist from './nicklist';
+import * as Sync from './sync';
 
 export type Command =
   Handshake.Handshake |
@@ -15,7 +16,9 @@ export type Command =
   Infolist.Infolist |
   Nicklist.Nicklist |
   Input.Input |
-  Completion.Completion
+  Completion.Completion |
+  Sync.Sync |
+  Sync.Desync;
 
 function exhaustive(never: never) {
     throw new Error('inexhaustive match on Command');
@@ -39,6 +42,10 @@ export function format(c: Command): string {
             return Input.format(c);
         case 'completion':
             return Completion.format(c);
+        case 'sync':
+            return Sync.format(c);
+        case 'desync':
+            return Sync.format(c);
         default:
             exhaustive(c);
     }
