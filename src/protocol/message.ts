@@ -7,17 +7,24 @@ export interface Payload {
     id?: string;
 }
 
+export type ObjectType =
+  'char' |
+  'int' |
+  'long' |
+  'string' |
+  'buffer' |
+  'pointer' |
+  'time' |
+  'hash' |
+  'hdata' |
+  'info' |
+  'infolist' |
+  'array';
+
 export class MessageParser {
     header(data: ArrayBuffer): [Header, ArrayBuffer] {
         const len = this.number(data, 0);
         return [null, null];
-    }
-
-    private char(data: ArrayBuffer, ptr: number): [number, string] {
-        return [
-            ptr + 1,
-            String.fromCharCode(new DataView(data).getUint8(ptr)),
-        ];
     }
 
     // unsigned
@@ -36,6 +43,69 @@ export class MessageParser {
         ];
     }
 
+    private char(data: ArrayBuffer, ptr: number): [number, string] {
+        const [ptr2, byt] = this.byte(data, ptr);
+        return [
+            ptr2,
+            String.fromCharCode(byt),
+        ];
+    }
+
+
+    private utfDecoder: TextDecoder = new TextDecoder();
+    private decode(data: ArrayBuffer): string {
+        return this.utfDecoder.decode(new Uint8Array(data));
+    }
+
+    private type(data: ArrayBuffer, ptr: number): [number, ObjectType?] {
+        var type: ObjectType;
+        switch (this.decode(data.slice(ptr, ptr + 3))) {
+            case 'chr':
+                type = 'char';
+                break;
+            case 'int':
+                type = 'int';
+                break;
+            case 'lon':
+                type = 'long';
+                break;
+            case 'str':
+                type = 'string';
+                break;
+            case 'buf':
+                type = 'buffer';
+                break;
+            case 'ptr':
+                type = 'pointer';
+                break;
+            case 'tim':
+                type = 'time';
+                break;
+            case 'htb':
+                type = 'hash';
+                break;
+            case 'hda':
+                type = 'hdata';
+                break;
+            case 'inf':
+                type = 'info';
+                break;
+            case 'inl':
+                type = 'infolist';
+                break;
+            case 'arr':
+                type = 'array';
+                break;
+            default:
+                type = null;
+                break;
+        }
+        return [
+            ptr + 3,
+            type,
+        ]
+    }
+
     private shortBuffer(data: ArrayBuffer, ptr: number): [number, ArrayBuffer] {
         const [ptr2, len] = this.byte(data, ptr);
         return [
@@ -51,7 +121,7 @@ export class MessageParser {
             case -1:
                 data = null;
                 break;
-            default:
+            default:  //TODO: do we have to special case 0?
                 data = data.slice(ptr2, ptr2 + len);
                 break;
         }
@@ -59,11 +129,6 @@ export class MessageParser {
             ptr2 + len,
             data,
         ];
-    }
-
-    private utfDecoder: TextDecoder = new TextDecoder();
-    private decode(data: ArrayBuffer): string {
-        return this.utfDecoder.decode(new Uint8Array(data));
     }
 
     private string(data: ArrayBuffer, ptr: number): [number, string?] {
