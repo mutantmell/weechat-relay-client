@@ -1,15 +1,15 @@
-import * as Completion from './completion';
-import * as Handshake from './handshake';
-import * as HData from './hdata';
-import * as Init from './init';
-import * as Info from './info';
-import * as Infolist from './infolist';
-import * as Input from './input';
-import * as Nicklist from './nicklist';
-import * as Ping from './ping';
-import * as Quit from './quit';
-import * as Sync from './sync';
-import * as Test from './test';
+import * as Completion from './command/completion';
+import * as Handshake from './command/handshake';
+import * as HData from './command/hdata';
+import * as Init from './command/init';
+import * as Info from './command/info';
+import * as Infolist from './command/infolist';
+import * as Input from './command/input';
+import * as Nicklist from './command/nicklist';
+import * as Ping from './command/ping';
+import * as Quit from './command/quit';
+import * as Sync from './command/sync';
+import * as Test from './command/test';
 
 export type Command =
   Handshake.Handshake |
