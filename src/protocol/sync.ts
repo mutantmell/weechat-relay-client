@@ -18,15 +18,8 @@ export interface Partial {
     options?: Set<Options>;
 }
 
-interface SyncName {
-    name: 'sync';
-}
-interface DesyncName {
-    name: 'desync';
-}
-
-export type Sync = SyncName & (Full | AllBuffers | Partial);
-export type Desync = DesyncName & (Full | AllBuffers | Partial);
+export type Sync = { name: 'sync' } & (Full | AllBuffers | Partial);
+export type Desync = { name: 'desync' } & (Full | AllBuffers | Partial);
 
 function exhaustive(never: never) {
     throw new Error('inexhaustive match on Sync');
