@@ -5,7 +5,7 @@ export interface Request {
     command: Command.Command;
 }
 
-export function format(r: Request) {
+export function format(r: Request): string {
     var args = [];
     if (r.id) {
         args.push(`(${r.id})`);
