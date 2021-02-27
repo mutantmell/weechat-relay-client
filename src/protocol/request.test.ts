@@ -7,12 +7,12 @@ describe('handshake serialization', () => {
             id: 'handshake',
             command: {
               name: 'handshake',
-            }
+            },
         };
 
         expect(Request.format(request)).toEqual(
             '(handshake) handshake\n'
-        )
+        );
     });
 
     test('serialize a handshake with plain auth', () => {
@@ -21,12 +21,12 @@ describe('handshake serialization', () => {
             command: {
               name: 'handshake',
               passwordHashAlgorithm: ['plain'],
-            }
+            },
         };
 
         expect(Request.format(request)).toEqual(
             '(handshake) handshake password_hash_algo=plain\n'
-        )
+        );
     });
 
     test('serialize a handshake with multiple supported algos', () => {
@@ -35,11 +35,26 @@ describe('handshake serialization', () => {
             command: {
               name: 'handshake',
               passwordHashAlgorithm: ['plain', Encryption.algo.sha256, Encryption.algo['sha256-pbkdf2']],
-            }
+            },
         };
 
         expect(Request.format(request)).toEqual(
             '(handshake) handshake password_hash_algo=plain:sha256:pbkdf2+sha256\n'
-        )
+        );
+    });
+
+    test('serialize a handshake with algos and compression disabled', () => {
+        const request: Request.Request = {
+            id: 'handshake',
+            command: {
+              name: 'handshake',
+              passwordHashAlgorithm: [Encryption.algo.sha256, Encryption.algo.sha512],
+              compression: 'off',
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            '(handshake) handshake password_hash_algo=sha256:sha512,compression=off\n'
+        );
     });
 });
