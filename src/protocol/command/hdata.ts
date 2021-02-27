@@ -40,16 +40,15 @@ export function format(h: HData): string {
     if (h.path.count) {
         path.push(formatCount(h.path.count));
     }
-    args.push(path.join(''));
-
     if (h.path.vars) {
         h.path.vars.forEach((v) => {
-            args.push(`/${v.name}`);
+            path.push('/', v.name);
             if (v.count) {
-                args.push(formatCount(v.count));
+                path.push(formatCount(v.count));
             }
         });
     }
+    args.push(path.join(''));
 
     if (h.keys) {
         args.push(h.keys.join(','));

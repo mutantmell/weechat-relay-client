@@ -176,4 +176,51 @@ describe('hdata serialization', () => {
             '(hdata_buffers) hdata buffer:gui_buffers(*) number,full_name\n'
         );
     });
+
+    test('hdata request for all lines of the first buffer', () => {
+        const request: Request.Request = {
+            id: 'hdata_lines',
+            command: {
+                name: 'hdata',
+                path: {
+                    name: 'buffer',
+                    pointer: Reference.parse('gui_buffers'),
+                    vars: [
+                        {
+                            name: 'own_lines',
+                        },
+                        {
+                            name: 'first_line',
+                            count: '*',
+                        },
+                        {
+                            name: 'data',
+                        },
+                    ],
+                },
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            '(hdata_lines) hdata buffer:gui_buffers/own_lines/first_line(*)/data\n'
+        );
+    });
+
+    test('hdata request for the hotlist contents', () => {
+        const request: Request.Request = {
+            id: 'hdata_hotlist',
+            command: {
+                name: 'hdata',
+                path: {
+                    name: 'hotlist',
+                    pointer: Reference.parse('gui_hotlist'),
+                    count: '*',
+                },
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            '(hdata_hotlist) hdata hotlist:gui_hotlist(*)\n'
+        );
+    });
 });
