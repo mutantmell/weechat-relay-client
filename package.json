@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/mutantmell/weechat-relay-client/issues"
   },
-  "homepage": "https://github.com/mutantmell/weechat-relay-client#readme"
+  "homepage": "https://github.com/mutantmell/weechat-relay-client#readme",
+  "devDependencies": {
+    "@types/node": "^14.14.31"
+  }
 }

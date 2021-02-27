@@ -1,12 +1,10 @@
+import * as ZLib from 'zlib';
+
 export type Compression = 'none' | 'zlib';
 
-export interface Header {
+interface Header {
     length: number;
     compression: Compression;
-}
-
-export interface Payload {
-    id?: string;
 }
 
 const objectTypes = [
@@ -105,14 +103,56 @@ function exhaustive(never: never) {
     throw new Error('inexhaustive match on WeeValue');
 }
 
+export interface Payload {
+    id?: string;
+    values: WeeValue[];
+}
+
 export class MessageParser {
-    header(data: ArrayBuffer): [ArrayBuffer, Header | null] | null {
+    public parse(data: ArrayBuffer): Payload {
+        const [ptr, header] = this.header(data);
+        if (data.byteLength !== header.length) {
+            throw new Error("mailformed payload");
+        }
+
+        var payloadData: ArrayBuffer;
+        switch (header.compression) {
+            case 'none':
+                payloadData = data.slice(ptr);
+                break;
+            case 'zlib':
+                payloadData = ZLib.inflateSync(data.slice(ptr));
+                break;
+            default:
+                exhaustive(header.compression);
+        }
+
+        const [ptr2, id] = this.map(
+            this.string(payloadData, 0),
+            (id) => id === "" ? null : id,
+        );
+        payloadData = payloadData.slice(ptr2);
+
+        const values = [];
+
+        while (payloadData.byteLength > 0) {
+            const [loopPtr, type] = this.type(payloadData, 0);
+            const parser = this.parserFor(type);
+            const [loopPtr2, value] = parser(payloadData, loopPtr);
+            values.push(value);
+            payloadData = payloadData.slice(loopPtr2);
+        }
+
+        return { id, values, };
+    }
+
+    private header(data: ArrayBuffer): [number, Header] {
         const [ptr2, length] = this.integer(data, 0);
         if (length !== data.byteLength) {
             return null;
         }
         const [ptr3, byt] = this.byte(data, ptr2);
-        var compression: Compression | null;
+        var compression: Compression;
         switch (byt) {
             case 0:
                 compression = 'none';
@@ -121,11 +161,10 @@ export class MessageParser {
                 compression = 'zlib';
                 break;
             default:
-                compression = null;
+                throw new Error('invalid header');
                 break;
         }
-        const header = compression ? { length, compression } : null;
-        return [data.slice(ptr3), header];
+        return [ptr3, { length, compression }];
     }
 
     private map<A,B>([ptr, a]: [number, A], f: (a: A) => B): [number, B] {
@@ -160,7 +199,7 @@ export class MessageParser {
         return this.utfDecoder.decode(new Uint8Array(data));
     }
 
-    private type(data: ArrayBuffer, ptr: number): [number, ObjectType | null] {
+    private type(data: ArrayBuffer, ptr: number): [number, ObjectType] {
         var type: ObjectType;
         switch (this.decode(data.slice(ptr, ptr + 3))) {
             case 'chr':
@@ -200,8 +239,7 @@ export class MessageParser {
                 type = 'array';
                 break;
             default:
-                type = null;
-                break;
+                throw new Error(`invalid type: ${type}`)
         }
         return [
             ptr + 3,
@@ -391,14 +429,10 @@ export class MessageParser {
             for (var j = 0; j < numVars; j++) {
                 const [varLoopPtr, varName] = this.string(data, loopPtr);
                 const [varLoopPtr2, varType] = this.type(data, varLoopPtr);
-                if (isObjectType(varType)) {
-                    const parser = this.parserFor(varType);
-                    const [varLoopPtr3, varValue] = parser(data, varLoopPtr2);
-                    vars.set(varName, varValue);
-                    loopPtr = varLoopPtr3;
-                } else {
-                    throw new Error(`invalid hdata: ${varType} is not a valid type`);
-                }
+                const parser = this.parserFor(varType);
+                const [varLoopPtr3, varValue] = parser(data, varLoopPtr2);
+                vars.set(varName, varValue);
+                loopPtr = varLoopPtr3;
             }
 
             items.push(vars);
@@ -409,12 +443,7 @@ export class MessageParser {
 
     private array(data: ArrayBuffer, ptr: number): [number, WeeValue[]] {
         const [ptr2, type] = this.type(data, ptr);
-        let parser;
-        if (isObjectType(type)) {
-            parser = this.parserFor(type);
-        } else {
-            throw new Error(`invalid hdata: ${type} is not a valid type`);
-        }
+        const parser = this.parserFor(type);
         const [ptr3, count] = this.integer(data, ptr2);
 
         const values = [];
