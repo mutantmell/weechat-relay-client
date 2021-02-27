@@ -327,3 +327,51 @@ describe('nicklist serialization', () => {
         );
     });
 });
+
+describe('completion serialization', () => {
+    test('completion of a command argument', () => {
+        const request: Request.Request = {
+            id: 'completion_help',
+            command: {
+                name: 'completion',
+                buffer: Reference.parse('core.weechat'),
+                data: '/help fi'
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            '(completion_help) completion core.weechat -1 /help fi\n'
+        );
+    });
+
+    test('completion of a command in the middle of a word', () => {
+        const request: Request.Request = {
+            id: 'completion_query',
+            command: {
+                name: 'completion',
+                buffer: Reference.parse('core.weechat'),
+                position: 5,
+                data: '/quernick'
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            '(completion_query) completion core.weechat 5 /quernick\n'
+        );
+    });
+
+    test('completion with nothing to complete', () => {
+        const request: Request.Request = {
+            id: 'completion_abcdefghijkl',
+            command: {
+                name: 'completion',
+                buffer: Reference.parse('core.weechat'),
+                data: 'abcdefghijkl'
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            '(completion_abcdefghijkl) completion core.weechat -1 abcdefghijkl\n'
+        );
+    });
+});

@@ -4,18 +4,14 @@ export interface Completion {
     name: 'completion';
     buffer: Reference.Reference;
     position?: number;
-    data?: string
+    data: string
 }
 
 export function format(c: Completion): string {
-    var args = [
+    return [
         'completion',
         Reference.format(c.buffer),
-        c.position ? c.position.toString() : "-1"
-    ];
-    if (c.data) {
-        args.push(c.data);
-    }
-
-    return args.join(' ');
+        c.position ? c.position.toString() : "-1",
+        c.data,
+    ].join(' ');
 }
