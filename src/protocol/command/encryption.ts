@@ -14,7 +14,12 @@ export interface HashKeyEncryption {
 
 export type Encryption = HashEncryption | HashKeyEncryption
 
-export const algo: { [x: string]: Encryption } = {
+export const algo: {
+    'sha256': HashEncryption,
+    'sha512': HashEncryption,
+    'sha256-pbkdf2': HashKeyEncryption,
+    'sha512-pbkdf2': HashKeyEncryption,
+} = {
     'sha256': { type: 'hash', hash: 'sha256', },
     'sha512': { type: 'hash', hash: 'sha512', },
     'sha256-pbkdf2': { type: 'hash-key', hash: 'sha256', keyDerivation: 'pbkdf2', },

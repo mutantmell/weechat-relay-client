@@ -33,7 +33,7 @@ export interface Init {
 }
 
 function escape(s: string): string {
-    return s.replace(",", "\\,");
+    return s.replace(/,/g, "\\,");
 }
 
 export function format(i: Init): string {
@@ -46,7 +46,7 @@ export function format(i: Init): string {
             args.push('password_hash=' + [
                 Encryption.format(i.password.encryption),
                 i.password.salt,
-                escape(i.password.hash)
+                i.password.hash
             ].join(':'));
             break;
         case 'password_key_hash':
@@ -54,7 +54,7 @@ export function format(i: Init): string {
                 Encryption.format(i.password.encryption),
                 i.password.salt,
                 i.password.iterations.toString(),
-                escape(i.password.hash)
+                i.password.hash
             ].join(':'));
             break;
         default:
