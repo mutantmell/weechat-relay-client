@@ -58,3 +58,18 @@ describe('handshake serialization', () => {
         );
     });
 });
+
+describe('init serialization', () => {
+    test('serialize init with password', () => {
+        const request: Request.Request = {
+            command: {
+              name: 'init',
+              password: { type: 'password', password: 'mypass', },
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            'init password=mypass\n'
+        );
+    });
+});
