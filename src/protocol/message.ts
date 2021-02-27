@@ -9,19 +9,25 @@ export interface Payload {
     id?: string;
 }
 
-export type ObjectType =
-  'char' |
-  'int' |
-  'long' |
-  'string' |
-  'buffer' |
-  'pointer' |
-  'time' |
-  'hash' |
-  'hdata' |
-  'info' |
-  'infolist' |
-  'array';
+const objectTypes = [
+    'char',
+    'int',
+    'long',
+    'string',
+    'buffer',
+    'pointer',
+    'time',
+    'hash',
+    'hdata',
+    'info',
+    'infolist',
+    'array',
+] as const;
+
+export type ObjectType = typeof objectTypes[number];
+function isObjectType (str: string): str is ObjectType {
+    return (objectTypes as readonly string[]).includes(str);
+}
 
 export interface WeeChar {
     type: 'char';
@@ -57,16 +63,37 @@ export interface WeeHash {
     valueTy: ObjectType;
     value: Map<WeeValue, WeeValue>;
 }
+export interface WeeHDataEntry {
+    ppath: string[];
+    entries: Map<string, WeeValue>
+}
+export interface WeeHData {
+    type: 'hdata';
+    hpath: string[];
+    value: WeeHDataEntry[];
+}
 
-export type WeeValue = WeeChar | WeeInt | WeeLong | WeeString | WeeBuffer | WeePointer | WeeTime | WeeHash;
+export type WeeValue =
+    WeeChar |
+    WeeInt |
+    WeeLong |
+    WeeString |
+    WeeBuffer |
+    WeePointer |
+    WeeTime |
+    WeeHash |
+    WeeHData;
 
 function exhaustive(never: never) {
     throw new Error('inexhaustive match on WeeValue');
 }
 
 export class MessageParser {
-    header(data: ArrayBuffer): [ArrayBuffer, Header | null] {
-        const [ptr2, length] = this.number(data, 0);
+    header(data: ArrayBuffer): [ArrayBuffer, Header | null] | null {
+        const [ptr2, length] = this.integer(data, 0);
+        if (length !== data.byteLength) {
+            return null;
+        }
         const [ptr3, byt] = this.byte(data, ptr2);
         var compression: Compression | null;
         switch (byt) {
@@ -97,7 +124,7 @@ export class MessageParser {
     }
 
     // signed
-    private number(data: ArrayBuffer, ptr: number): [number, number] {
+    private integer(data: ArrayBuffer, ptr: number): [number, number] {
         return [
             ptr + 4,
             new DataView(data).getInt32(ptr, false),
@@ -174,7 +201,7 @@ export class MessageParser {
     }
 
     private buffer(data: ArrayBuffer, ptr: number): [number, ArrayBuffer | null] {
-        const [ptr2, len] = this.number(data, ptr);
+        const [ptr2, len] = this.integer(data, ptr);
         var data: ArrayBuffer;
         switch(len) {
             case -1:
@@ -230,14 +257,14 @@ export class MessageParser {
             case 'hash':
                 return this.hashtable;
             case 'hdata':
-                return null;
+                return this.hdata;
             case 'info':
                 return null;
             case 'infolist':
                 return null;
             case 'int':
                 return (data, ptr) => this.map(
-                    this.number(data, ptr),
+                    this.integer(data, ptr),
                     num => ({ type: 'int', value: num })
                 );
             case 'long':
@@ -268,7 +295,7 @@ export class MessageParser {
     private hashtable(data: ArrayBuffer, ptr: number): [number, WeeHash] {
         const [ptr2, keyTy] = this.type(data, ptr);
         const [ptr3, valueTy] = this.type(data, ptr2);
-        const [ptr4, count] = this.number(data, ptr3);
+        const [ptr4, count] = this.integer(data, ptr3);
 
         const keyPar = this.parserFor(keyTy);
         const valuePar = this.parserFor(valueTy);
@@ -282,5 +309,43 @@ export class MessageParser {
             loopPtr = loopPtr3;
         }
         return [loopPtr, { type: 'hash', keyTy, valueTy, value: map }];
+    }
+
+    private hdata(data: ArrayBuffer, ptr: number): [number, WeeHData] {
+        const [ptr2, hpath] = this.map(
+            this.string(data, ptr),
+            (path) => path ? path.split('/') : [],
+        );
+        const [ptr3, keys] = this.map(
+            this.string(data, ptr2),
+            (keys) => keys ? keys.split(',').map((kv) => kv.split(':')) : [],
+        );
+        const [ptr4, count] = this.integer(data, ptr3);
+
+        const value: WeeHDataEntry[] = [];
+        var loopPtr = ptr4;
+        for (var i = 0; i < count; i++) {
+            const ppath = [];
+            for (var j = 0; j < hpath.length; j++) {
+                const [ppathsPtr, ptr] = this.pointer(data, loopPtr);
+                ppath.push(ptr);
+                loopPtr = ppathsPtr;
+            }
+            const entries = new Map<string, WeeValue>();
+            keys.forEach(([key, val]) => {
+                if (isObjectType(val)) {
+                    const parser = this.parserFor(val);
+                    const [keysPtr, value] = parser(data, loopPtr);
+                    entries.set(key, value);
+                    loopPtr = keysPtr;
+                } else {
+                    throw new Error(`invalid hdata: ${val} is not a valid type`);
+                }
+            });
+
+            value.push({ ppath, entries, });
+        }
+
+        return [loopPtr, { type: 'hdata', hpath, value }];
     }
 }
