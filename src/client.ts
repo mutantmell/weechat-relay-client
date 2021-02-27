@@ -20,7 +20,7 @@ export class Weechat {
     }
 
     public send(requests: [Request.Request, ...Request.Request[]]): void {
-        this.ws.send(requests.map((req) => Request.format(req)).join("\n") + "\n");
+        this.ws.send(requests.map((req) => Request.format(req)).join());
     }
 
 }

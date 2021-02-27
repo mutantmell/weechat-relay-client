@@ -12,5 +12,5 @@ export function format(r: Request): string {
     }
     args.push(Command.format(r.command));
 
-    return args.join(' ');
+    return args.join(' ') + '\n';
 }

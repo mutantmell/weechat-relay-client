@@ -109,6 +109,13 @@ export interface Payload {
 }
 
 export class MessageParser {
+    
+    private utfDecoder: TextDecoder;
+
+    constructor(utfDecoder: TextDecoder) {
+        this.utfDecoder = utfDecoder;
+    }
+
     public parse(data: ArrayBuffer): Payload {
         const [ptr, header] = this.header(data);
         if (data.byteLength !== header.length) {
@@ -194,7 +201,6 @@ export class MessageParser {
         );
     }
 
-    private utfDecoder: TextDecoder = new TextDecoder();
     private decode(data: ArrayBuffer): string {
         return this.utfDecoder.decode(new Uint8Array(data));
     }
@@ -456,4 +462,8 @@ export class MessageParser {
 
         return [loopPtr, values];
     }
+}
+
+export function make(): MessageParser {
+    return new MessageParser(new TextDecoder());
 }

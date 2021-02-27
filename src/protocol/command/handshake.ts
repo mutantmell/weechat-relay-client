@@ -12,18 +12,23 @@ export interface Handshake {
 }
 
 export function format(h: Handshake): string {
-    const args = [];
+    const command = [
+        'handshake'
+    ];
 
+    const args = [];
     if (h.passwordHashAlgorithm === 'plain') {
         args.push('password_hash_algo=plain');
     } else if (h.passwordHashAlgorithm) {
         const pass = Encryption.format(h.passwordHashAlgorithm)
         args.push(`password_hash_algo=${pass}`);
     }
-
     if (h.compression) {
         args.push(`compression=${h.compression}`);
     }
+    if (args.length > 0) {
+        command.push(args.join(","));
+    }
 
-    return `handshake ${args.join(",")}`;
+    return command.join(' ');
 }

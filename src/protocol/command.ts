@@ -9,7 +9,7 @@ import * as Nicklist from './command/nicklist';
 import * as Ping from './command/ping';
 import * as Quit from './command/quit';
 import * as Sync from './command/sync';
-import * as Test from './command/test';
+import * as Test from './command/test-c';
 
 export type Command =
   Handshake.Handshake |
