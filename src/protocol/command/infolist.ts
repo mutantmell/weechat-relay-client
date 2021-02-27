@@ -5,10 +5,13 @@ export interface Infolist {
 }
 
 export function format(i: Infolist): string {
-    var args = [i.value];
+    var args = [
+        'infolist',
+        i.value,
+    ];
     if (i.pointer) {
         args.push(i.pointer);
     }
 
-    return `infolist ${args.join(' ')}`;
+    return args.join(' ');
 }

@@ -4,10 +4,10 @@ export interface Nicklist {
 }
 
 export function format(n: Nicklist): string {
-    var args = [];
+    var args = ['nicklist'];
     if (n.buffer) {
         args.push(n.buffer);
     }
 
-    return `nicklist ${args.join()}`;
+    return args.join(' ');
 }

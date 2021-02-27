@@ -9,6 +9,7 @@ export interface Completion {
 
 export function format(c: Completion): string {
     var args = [
+        'completion',
         Reference.format(c.buffer),
         c.position ? c.position.toString() : "-1"
     ];
@@ -16,5 +17,5 @@ export function format(c: Completion): string {
         args.push(c.data);
     }
 
-    return `completion ${args.join(' ')}`
+    return args.join(' ');
 }

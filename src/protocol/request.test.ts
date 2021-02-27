@@ -269,7 +269,6 @@ describe('info serialization', () => {
     });
 });
 
-
 describe('infolist serialization', () => {
     test('infolist request for "buffer"', () => {
         const request: Request.Request = {
@@ -296,6 +295,35 @@ describe('infolist serialization', () => {
 
         expect(Request.format(request)).toEqual(
             '(infolist_window) infolist window\n'
+        );
+    });
+});
+
+describe('nicklist serialization', () => {
+    test('nicklist request for all buffers', () => {
+        const request: Request.Request = {
+            id: 'nicklist_all',
+            command: {
+                name: 'nicklist',
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            '(nicklist_all) nicklist\n'
+        );
+    });
+
+    test('nicklist request for buffer "irc.freenode.#weechat"', () => {
+        const request: Request.Request = {
+            id: 'nicklist_weechat',
+            command: {
+                name: 'nicklist',
+                buffer: 'irc.freenode.#weechat',
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            '(nicklist_weechat) nicklist irc.freenode.#weechat\n'
         );
     });
 });
