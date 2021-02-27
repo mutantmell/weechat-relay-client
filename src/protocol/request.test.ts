@@ -1,4 +1,5 @@
 import * as Encryption from './command/encryption';
+import * as Reference from './command/reference';
 import * as Request from './request';
 
 describe('handshake serialization', () => {
@@ -152,6 +153,27 @@ describe('init serialization', () => {
 
         expect(Request.format(request)).toEqual(
             'init password_hash=pbkdf2+sha256:85b1ee00695a5b254e14f4885538df0da4b73207f5aae4:100000:ba7facc3edb89cd06ae810e29ced85980ff36de2bb596fcf513aaab626876440\n'
+        );
+    });
+});
+
+describe('hdata serialization', () => {
+    test('hdata request for "number" and "full_name" of all buffers', () => {
+        const request: Request.Request = {
+            id: 'hdata_buffers',
+            command: {
+                name: 'hdata',
+                path: {
+                    name: 'buffer',
+                    pointer: Reference.parse('gui_buffers'),
+                    count: '*',
+                },
+                keys: ['number','full_name'],
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            '(hdata_buffers) hdata buffer:gui_buffers(*) number,full_name\n'
         );
     });
 });
