@@ -224,3 +224,78 @@ describe('hdata serialization', () => {
         );
     });
 });
+
+describe('info serialization', () => {
+    test('info request for "version"', () => {
+        const request: Request.Request = {
+            id: 'info_version',
+            command: {
+                name: 'info',
+                value: 'version',
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            '(info_version) info version\n'
+        );
+    });
+
+    test('info request for "version_number"', () => {
+        const request: Request.Request = {
+            id: 'info_version_number',
+            command: {
+                name: 'info',
+                value: 'version_number',
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            '(info_version_number) info version_number\n'
+        );
+    });
+
+    test('info request for "weechat_dir"', () => {
+        const request: Request.Request = {
+            id: 'info_weechat_dir',
+            command: {
+                name: 'info',
+                value: 'weechat_dir',
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            '(info_weechat_dir) info weechat_dir\n'
+        );
+    });
+});
+
+
+describe('infolist serialization', () => {
+    test('infolist request for "buffer"', () => {
+        const request: Request.Request = {
+            id: 'infolist_buffer',
+            command: {
+                name: 'infolist',
+                value: 'buffer',
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            '(infolist_buffer) infolist buffer\n'
+        );
+    });
+
+    test('infolist request for "window"', () => {
+        const request: Request.Request = {
+            id: 'infolist_window',
+            command: {
+                name: 'infolist',
+                value: 'window',
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            '(infolist_window) infolist window\n'
+        );
+    });
+});
