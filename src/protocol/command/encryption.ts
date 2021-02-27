@@ -14,6 +14,13 @@ export interface HashKeyEncryption {
 
 export type Encryption = HashEncryption | HashKeyEncryption
 
+export const algo: { [x: string]: Encryption } = {
+    'sha256': { type: 'hash', hash: 'sha256', },
+    'sha512': { type: 'hash', hash: 'sha512', },
+    'sha256-pbkdf2': { type: 'hash-key', hash: 'sha256', keyDerivation: 'pbkdf2', },
+    'sha512-pbkdf2': { type: 'hash-key', hash: 'sha512', keyDerivation: 'pbkdf2', },
+}
+
 function exhaustive(never: never) {
     throw new Error('inexhaustive match on Encryption');
 }
@@ -21,7 +28,7 @@ function exhaustive(never: never) {
 export function format(e: Encryption): string {
     switch (e.type) {
         case 'hash': return e.hash;
-        case 'hash-key': return `${e.hash}-${e.keyDerivation}`;
+        case 'hash-key': return `${e.keyDerivation}+${e.hash}`;
         default: exhaustive(e);
     }
 }

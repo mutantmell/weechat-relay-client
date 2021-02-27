@@ -7,7 +7,7 @@ export type Compression = 'zlib' | 'off';
 
 export interface Handshake {
     name: 'handshake';
-    passwordHashAlgorithm?: PasswordHashAlgorithm;
+    passwordHashAlgorithm?: PasswordHashAlgorithm[];
     compression?: Compression;
 }
 
@@ -17,11 +17,16 @@ export function format(h: Handshake): string {
     ];
 
     const args = [];
-    if (h.passwordHashAlgorithm === 'plain') {
-        args.push('password_hash_algo=plain');
-    } else if (h.passwordHashAlgorithm) {
-        const pass = Encryption.format(h.passwordHashAlgorithm)
-        args.push(`password_hash_algo=${pass}`);
+    if (h.passwordHashAlgorithm) {
+        const algos = [];
+        h.passwordHashAlgorithm.forEach((algo) => {
+            if (algo === 'plain') {
+                algos.push('plain');
+            } else {
+                algos.push(Encryption.format(algo));
+            }
+        });
+        args.push(`password_hash_algo=${algos.join(':')}`);
     }
     if (h.compression) {
         args.push(`compression=${h.compression}`);
