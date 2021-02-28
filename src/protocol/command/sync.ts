@@ -4,18 +4,18 @@ export interface Full {
     type: 'full';
 }
 
-export type AllBuffersOptions = 'buffers' | 'upgrade';
-export type Options = AllBuffersOptions | 'buffer' | 'nicklist';
+export type PartialOptions = 'buffers' | 'upgrade';
+export type Options = PartialOptions | 'buffer' | 'nicklist';
 
 export interface AllBuffers {
     type: 'all-buffers';
-    options?: Set<AllBuffersOptions>;
+    options?: Set<Options>;
 }
 
 export interface Partial {
     type: 'partial';
     buffer: Reference.Reference;
-    options?: Set<Options>;
+    options?: Set<PartialOptions>;
 }
 
 export type Sync = { name: 'sync' } & (Full | AllBuffers | Partial);

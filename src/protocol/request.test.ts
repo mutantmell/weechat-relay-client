@@ -375,3 +375,47 @@ describe('completion serialization', () => {
         );
     });
 });
+
+(['sync', 'desync'] as ('sync' | 'desync')[]).forEach (command => {
+    describe(`${command} serialization`, () => {
+        test(`${command} all buffers (1)`, () => {
+            const request: Request.Request = {
+                command: {
+                    name: command,
+                    type: 'full',
+                },
+            };
+    
+            expect(Request.format(request)).toEqual(
+                `${command}\n`
+            );
+        });
+
+        test(`${command} all buffers (2)`, () => {
+            const request: Request.Request = {
+                command: {
+                    name: command,
+                    type: 'all-buffers',
+                },
+            };
+    
+            expect(Request.format(request)).toEqual(
+                `${command} *\n`
+            );
+        });
+
+        test(`${command} all buffers (3)`, () => {
+            const request: Request.Request = {
+                command: {
+                    name: command,
+                    type: 'all-buffers',
+                    options: new Set(['buffers','upgrade','buffer','nicklist']),
+                },
+            };
+    
+            expect(Request.format(request)).toEqual(
+                `${command} * buffers,upgrade,buffer,nicklist\n`
+            );
+        });
+    });
+});
