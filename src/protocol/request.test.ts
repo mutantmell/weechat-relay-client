@@ -417,5 +417,77 @@ describe('completion serialization', () => {
                 `${command} * buffers,upgrade,buffer,nicklist\n`
             );
         });
+
+        test(`${command} weechat core buffer`, () => {
+            const request: Request.Request = {
+                command: {
+                    name: command,
+                    type: 'partial',
+                    buffer: Reference.parse('core.buffer'),
+                },
+            };
+    
+            expect(Request.format(request)).toEqual(
+                `${command} core.buffer\n`
+            );
+        });
+
+        test(`${command} #weechat channel, without nicklist`, () => {
+            const request: Request.Request = {
+                command: {
+                    name: command,
+                    type: 'partial',
+                    buffer: Reference.parse('irc.freenode.#weechat'),
+                    options: new Set(['buffer']),
+                },
+            };
+    
+            expect(Request.format(request)).toEqual(
+                `${command} irc.freenode.#weechat buffer\n`
+            );
+        });
+
+        test(`${command} #weechat channel nicklist`, () => {
+            const request: Request.Request = {
+                command: {
+                    name: command,
+                    type: 'partial',
+                    buffer: Reference.parse('irc.freenode.#weechat'),
+                    options: new Set(['nicklist']),
+                },
+            };
+    
+            expect(Request.format(request)).toEqual(
+                `${command} irc.freenode.#weechat nicklist\n`
+            );
+        });
+
+        test(`${command} all general signals`, () => {
+            const request: Request.Request = {
+                command: {
+                    name: command,
+                    type: 'all-buffers',
+                    options: new Set(['buffers','upgrade']),
+                },
+            };
+    
+            expect(Request.format(request)).toEqual(
+                `${command} * buffers,upgrade\n`
+            );
+        });
+
+        test(`${command} all signals for #weechat channel`, () => {
+            const request: Request.Request = {
+                command: {
+                    name: command,
+                    type: 'partial',
+                    buffer:Reference.parse('irc.freenode.#weechat'),
+                },
+            };
+    
+            expect(Request.format(request)).toEqual(
+                `${command} irc.freenode.#weechat\n`
+            );
+        });
     });
 });

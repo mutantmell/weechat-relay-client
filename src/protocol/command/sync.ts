@@ -4,8 +4,8 @@ export interface Full {
     type: 'full';
 }
 
-export type PartialOptions = 'buffers' | 'upgrade';
-export type Options = PartialOptions | 'buffer' | 'nicklist';
+export type PartialOptions = 'buffer' | 'nicklist';
+export type Options = 'buffers' | 'upgrade' | PartialOptions;
 
 export interface AllBuffers {
     type: 'all-buffers';
