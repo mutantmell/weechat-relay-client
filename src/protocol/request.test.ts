@@ -376,7 +376,7 @@ describe('completion serialization', () => {
     });
 });
 
-(['sync', 'desync'] as ('sync' | 'desync')[]).forEach (command => {
+(['sync', 'desync'] as ['sync', 'desync']).forEach (command => {
     describe(`${command} serialization`, () => {
         test(`${command} all buffers (1)`, () => {
             const request: Request.Request = {
@@ -489,5 +489,49 @@ describe('completion serialization', () => {
                 `${command} irc.freenode.#weechat\n`
             );
         });
+    });
+});
+
+describe('test serialization', () => {
+    test('test command', () => {
+        const request: Request.Request = {
+            id: 'test',
+            command: {
+                name: 'test',
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            '(test) test\n'
+        );
+    });
+});
+
+describe('ping serialization', () => {
+    test('ping command', () => {
+        const request: Request.Request = {
+            command: {
+                name: 'ping',
+                argument: '1370802127000'
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            'ping 1370802127000\n'
+        );
+    });
+});
+
+describe('quit serialization', () => {
+    test('quit command', () => {
+        const request: Request.Request = {
+            command: {
+                name: 'quit',
+            },
+        };
+
+        expect(Request.format(request)).toEqual(
+            'quit\n'
+        );
     });
 });

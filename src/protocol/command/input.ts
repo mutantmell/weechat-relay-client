@@ -5,5 +5,9 @@ export interface Input {
 }
 
 export function format(i: Input): string {
-    return `input ${i.buffer} ${i.data}`;
+    return [
+        'input',
+        i.buffer,
+        i.data
+    ].join(' ');
 }
