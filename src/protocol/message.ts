@@ -103,7 +103,7 @@ function exhaustive(never: never) {
     throw new Error('inexhaustive match on WeeValue');
 }
 
-export interface Payload {
+export interface Message {
     id?: string;
     values: WeeValue[];
 }
@@ -116,7 +116,7 @@ export class MessageParser {
         this.utfDecoder = utfDecoder;
     }
 
-    public parse(data: ArrayBuffer): Payload {
+    public parse(data: ArrayBuffer): Message {
         const [ptr, header] = this.header(data);
         if (data.byteLength !== header.length) {
             throw new Error("mailformed payload");
