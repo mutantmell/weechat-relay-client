@@ -41,11 +41,11 @@ export interface WeeLong {
 }
 export interface WeeString {
     type: 'string';
-    value: string;
+    value: string | null;
 }
 export interface WeeBuffer {
     type: 'buffer';
-    value: ArrayBuffer;
+    value: ArrayBuffer | null;
 }
 export interface WeePointer {
     type: 'pointer';

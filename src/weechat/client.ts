@@ -33,5 +33,8 @@ export class Weechat {
         // this is inefficient, as we have to parse once/consumer, but eh
         this.ws.addEventListener('message', event => onMessage(this.parser.parse(event.data)))
     }
+}
 
+export interface WeechatListener {
+    
 }
