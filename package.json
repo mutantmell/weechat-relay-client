@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "jest"
+    "test": "jest --config=jest.config.test.js",
+    "it": "jest --config=jest.config.it.js"
   },
   "repository": {
     "type": "git",
