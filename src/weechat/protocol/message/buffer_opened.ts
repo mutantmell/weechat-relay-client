@@ -2,6 +2,7 @@ import { exception } from "console";
 import { Message, WeeBuffer, WeeHash, WeeInt, WeePointer, WeeString, WeeValue } from "../message";
 
 export interface BufferOpened {
+    type: '_buffer_opened',
     number: number
     fullName: string
     shortName: string | null
@@ -34,6 +35,7 @@ export function parse(msg: Message): BufferOpened[] {
         });
 
         return {
+            type: '_buffer_opened',
             number: (hdata.entries['number'] as WeeInt).value,
             fullName: (hdata.entries['full_name'] as WeeString).value,
             shortName: (hdata.entries['full_name'] as WeeString).value,
@@ -42,6 +44,6 @@ export function parse(msg: Message): BufferOpened[] {
             localVariables: lv,
             prevBuffer: (hdata.entries['prev_buffer'] as WeeBuffer),
             nextBuffer: (hdata.entries['next_buffer'] as WeeBuffer),
-        }
-    })
+        };
+    });
 }
