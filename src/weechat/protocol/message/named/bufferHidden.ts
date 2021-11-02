@@ -1,15 +1,15 @@
 import { exception } from "console";
-import { Message, WeeBuffer, WeeHash, WeeInt, WeePointer, WeeString, WeeValue } from "../message";
+import { Message, WeeBuffer, WeeInt, WeeString } from "../../message";
 
-export interface BufferMerged {
-    type: '_buffer_merged'
+export interface BufferHidden {
+    type: '_buffer_hidden'
     number: number
     fullName: string
     prevBuffer: WeeBuffer
     nextBuffer: WeeBuffer
 }
 
-export function parse(msg: Message): BufferMerged[] {
+export function parse(msg: Message): BufferHidden[] {
     if (msg.values.length !== 1) {
         throw new exception("what");
     }
@@ -21,7 +21,7 @@ export function parse(msg: Message): BufferMerged[] {
     }
 
     return value.value.map(hdata => ({
-        type: '_buffer_merged',
+        type: '_buffer_hidden',
         number: (hdata.entries['number'] as WeeInt).value,
         fullName: (hdata.entries['full_name'] as WeeString).value,
         prevBuffer: (hdata.entries['prev_buffer'] as WeeBuffer),

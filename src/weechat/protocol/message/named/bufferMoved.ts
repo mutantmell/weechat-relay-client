@@ -1,5 +1,5 @@
 import { exception } from "console";
-import { Message, WeeBuffer, WeeHash, WeeInt, WeePointer, WeeString, WeeValue } from "../message";
+import { Message, WeeBuffer, WeeInt, WeeString } from "../../message";
 
 export interface BufferMoved {
     type: '_buffer_moved',
