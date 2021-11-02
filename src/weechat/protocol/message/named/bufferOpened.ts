@@ -26,14 +26,14 @@ export function parse(msg: Message): BufferOpened[] {
     }
 
     return value.value.map(hdata => ({
-            type: '_buffer_opened',
-            number: (hdata.entries['number'] as WeeInt).value,
-            fullName: (hdata.entries['full_name'] as WeeString).value,
-            shortName: (hdata.entries['full_name'] as WeeString).value,
-            hasNicklist: (hdata.entries['nicklist'] as WeeInt).value == 1,
-            title: (hdata.entries['title'] as WeeString).value,
-            localVariables: constructLocalVariables(hdata),
-            prevBuffer: (hdata.entries['prev_buffer'] as WeeBuffer),
-            nextBuffer: (hdata.entries['next_buffer'] as WeeBuffer),
+        type: '_buffer_opened',
+        number: (hdata.entries['number'] as WeeInt).value,
+        fullName: (hdata.entries['full_name'] as WeeString).value,
+        shortName: (hdata.entries['full_name'] as WeeString).value,
+        hasNicklist: (hdata.entries['nicklist'] as WeeInt).value === 1,
+        title: (hdata.entries['title'] as WeeString).value,
+        localVariables: constructLocalVariables(hdata),
+        prevBuffer: (hdata.entries['prev_buffer'] as WeeBuffer),
+        nextBuffer: (hdata.entries['next_buffer'] as WeeBuffer),
     }));
 }

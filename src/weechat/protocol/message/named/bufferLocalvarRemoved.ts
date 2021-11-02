@@ -2,15 +2,14 @@ import { exception } from "console";
 import { Message, WeeInt, WeeString }  from "../../message";
 import { constructLocalVariables } from "../constructLocalVariables";
 
-export interface BufferRenamed {
-    type: '_buffer_renamed'
+export interface BufferLocalvarRemoved {
+    type: '_buffer_localvar_removed'
     number: number
     fullName: string
-    shortName: string
     localVariables: Map<string, string>
 }
 
-export function parse(msg: Message): BufferRenamed[] {
+export function parse(msg: Message): BufferLocalvarRemoved[] {
     if (msg.values.length !== 1) {
         throw new exception("what");
     }
@@ -22,10 +21,9 @@ export function parse(msg: Message): BufferRenamed[] {
     }
 
     return value.value.map(hdata => ({
-        type: '_buffer_renamed',
+        type: '_buffer_localvar_removed',
         number: (hdata.entries['number'] as WeeInt).value,
         fullName: (hdata.entries['full_name'] as WeeString).value,
-        shortName: (hdata.entries['short_name'] as WeeString).value,
         localVariables: constructLocalVariables(hdata),
     }));
 }
