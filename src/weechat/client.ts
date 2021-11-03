@@ -46,7 +46,10 @@ export class Weechat {
 
     public register(onMessage: (msg: Message.Message) => void) {
         // this is inefficient, as we have to parse once/consumer, but eh
-        this.ws.addEventListener('message', event => onMessage(this.parser.parse(event.data)))
+        this.ws.addEventListener('message', event => {
+            console.log(event);
+            onMessage(this.parser.parse(event.data));
+        });
     }
 }
 
