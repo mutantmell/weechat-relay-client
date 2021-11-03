@@ -116,20 +116,7 @@ export class MessageParser {
         this.utfDecoder = utfDecoder;
     }
 
-    public parse(data: Buffer): Message {
-        return this.parseAB(this.toArrayBuffer(data));
-    }
-
-    private toArrayBuffer(buffer: Buffer) {
-        const arrayBuffer = new ArrayBuffer(buffer.length);
-        const view = new Uint8Array(arrayBuffer);
-        for (var i = 0; i < buffer.length; i++) {
-            view[i] = buffer[i];
-        }
-        return arrayBuffer;
-    }
-
-    private parseAB(data: ArrayBuffer): Message {
+    public parse(data: ArrayBuffer): Message {
         const [ptr, header] = this.header(data);
         if (data.byteLength !== header.length) {
             throw new Error("mailformed payload");
@@ -466,6 +453,15 @@ export class MessageParser {
         }
 
         return [loopPtr, values];
+    }
+
+    private toArrayBuffer(buffer: Buffer) {
+        const arrayBuffer = new ArrayBuffer(buffer.length);
+        const view = new Uint8Array(arrayBuffer);
+        for (var i = 0; i < buffer.length; i++) {
+            view[i] = buffer[i];
+        }
+        return arrayBuffer;
     }
 }
 

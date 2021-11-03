@@ -23,6 +23,7 @@ export class Weechat {
         const ws = new WebSocket(
             `ws://${config.url}:${config.port}/weechat`
         );
+        ws.binaryType = 'arraybuffer';
         ws.onopen = () => {
             while (messages.length > 0) {
                 ws.send(messages.pop());
@@ -50,7 +51,7 @@ export class Weechat {
     public register(onMessage: (msg: Message.Message) => void) {
         // this is inefficient, as we have to parse once/consumer, but eh
         this.ws.addEventListener('message', event => {
-            onMessage(this.parser.parse(event.data));
+            onMessage(this.parser.parse(event.data as ArrayBuffer));
         });
     }
 
