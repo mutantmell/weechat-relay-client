@@ -1,4 +1,3 @@
-import { exception } from "console";
 import { Message, WeeBuffer, WeeInt, WeeString } from "../../message";
 
 export interface BufferHidden {
@@ -11,13 +10,13 @@ export interface BufferHidden {
 
 export function parse(msg: Message): BufferHidden[] {
     if (msg.values.length !== 1) {
-        throw new exception("what");
+        throw new Error("what");
     }
 
     const value = msg.values[0];
 
     if (value.type !== "hdata") {
-        throw new exception("what");
+        throw new Error("what");
     }
 
     return value.value.map(hdata => ({

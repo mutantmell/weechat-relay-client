@@ -1,4 +1,3 @@
-import { exception } from "console";
 import { Message, WeeArray, WeeInt, WeePointer, WeeString, WeeTime } from "../../message";
 import { NotifyLevel } from "../notifyLevel";
 
@@ -17,13 +16,13 @@ export interface BufferLineAdded {
 
 export function parse(msg: Message): BufferLineAdded[] {
     if (msg.values.length !== 1) {
-        throw new exception("what");
+        throw new Error("what");
     }
 
     const value = msg.values[0];
 
     if (value.type !== "hdata") {
-        throw new exception("what");
+        throw new Error("what");
     }
 
     return value.value.map(hdata => ({

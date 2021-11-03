@@ -1,4 +1,3 @@
-import { exception } from "console";
 import { Message, WeeBuffer, WeeInt, WeeString } from "../../message";
 
 export interface BufferUnmerged {
@@ -11,13 +10,13 @@ export interface BufferUnmerged {
 
 export function parse(msg: Message): BufferUnmerged[] {
     if (msg.values.length !== 1) {
-        throw new exception("what");
+        throw new Error("what");
     }
 
     const value = msg.values[0];
 
     if (value.type !== "hdata") {
-        throw new exception("what");
+        throw new Error("what");
     }
 
     return value.value.map(hdata => ({

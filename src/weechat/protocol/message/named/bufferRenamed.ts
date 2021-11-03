@@ -1,4 +1,3 @@
-import { exception } from "console";
 import { Message, WeeInt, WeeString }  from "../../message";
 import { constructLocalVariables } from "../constructLocalVariables";
 
@@ -12,13 +11,13 @@ export interface BufferRenamed {
 
 export function parse(msg: Message): BufferRenamed[] {
     if (msg.values.length !== 1) {
-        throw new exception("what");
+        throw new Error("what");
     }
 
     const value = msg.values[0];
 
     if (value.type !== "hdata") {
-        throw new exception("what");
+        throw new Error("what");
     }
 
     return value.value.map(hdata => ({
