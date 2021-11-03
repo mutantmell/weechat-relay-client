@@ -21,7 +21,7 @@ export class Weechat {
     public static make(config: Config): Weechat {
         const messages = [];
         const ws = new WebSocket(
-            `ws://${config.url}:${config.port}`
+            `ws://${config.url}:${config.port}/weechat`
         );
         ws.onopen = () => {
             while (messages.length > 0) {
@@ -31,6 +31,9 @@ export class Weechat {
         const parser = new Message.MessageParser(
             new TextDecoder()
         );
+        ws.onerror = (ev) => {
+            console.log(ev);
+        };
         
         return new Weechat(ws, parser, messages);
     }
@@ -43,13 +46,16 @@ export class Weechat {
             this.ws.send(msg);
         }
     }
-
+    
     public register(onMessage: (msg: Message.Message) => void) {
         // this is inefficient, as we have to parse once/consumer, but eh
         this.ws.addEventListener('message', event => {
-            console.log(event);
             onMessage(this.parser.parse(event.data));
         });
+    }
+
+    public close(): void {
+        this.ws.close();
     }
 }
 

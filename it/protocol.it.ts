@@ -1,19 +1,19 @@
-import { rejects } from "assert";
 import { Message, Weechat } from "../src/weechat";
+import * as HandshakeResponse from "../src/weechat/protocol/message/implicit/handshakeResponse";
 
 
 describe('weechat integration test', () => {
     function client() {
         return Weechat.make({
-            url: "http://localhost",
-            port: 9001
+            url: "localhost",
+            port: 9000
         });
     } 
 
     it('should not currently work', async () => {
         var wc = client();
 
-        const messages = new Promise((res) => {
+        const messages = new Promise<Message>((res) => {
             wc.register(msg => {
                 res(msg);
             })
@@ -26,17 +26,17 @@ describe('weechat integration test', () => {
             }
         }])
 
-        var result = await Promise.race([
-            messages,
-            new Promise((_, rej) => {
-                setTimeout(() => {
-                    rej("took too long to receive message");
-                }, 2000);
-            })
-        ]);
+        var result = await messages.then(HandshakeResponse.parse);
 
         expect(result).toEqual({
-            'not': 'the-same'
+            type: 'handshake_response',
+            passwordHashAlgo: 'plain',
+            passwordHashIterations: 100000,
+            totp: false,
+            nonce: result.nonce, // randomly generated
+            compression: 'zlib',
         })
+
+        wc.close();
     })
 });

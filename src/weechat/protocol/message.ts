@@ -116,7 +116,20 @@ export class MessageParser {
         this.utfDecoder = utfDecoder;
     }
 
-    public parse(data: ArrayBuffer): Message {
+    public parse(data: Buffer): Message {
+        return this.parseAB(this.toArrayBuffer(data));
+    }
+
+    private toArrayBuffer(buffer: Buffer) {
+        const arrayBuffer = new ArrayBuffer(buffer.length);
+        const view = new Uint8Array(arrayBuffer);
+        for (var i = 0; i < buffer.length; i++) {
+            view[i] = buffer[i];
+        }
+        return arrayBuffer;
+    }
+
+    private parseAB(data: ArrayBuffer): Message {
         const [ptr, header] = this.header(data);
         if (data.byteLength !== header.length) {
             throw new Error("mailformed payload");
@@ -128,7 +141,7 @@ export class MessageParser {
                 payloadData = data.slice(ptr);
                 break;
             case 'zlib':
-                payloadData = ZLib.inflateSync(data.slice(ptr));
+                payloadData = this.toArrayBuffer(ZLib.inflateSync(data.slice(ptr)));
                 break;
             default:
                 exhaustive(header.compression);
@@ -144,8 +157,7 @@ export class MessageParser {
 
         while (payloadData.byteLength > 0) {
             const [loopPtr, type] = this.type(payloadData, 0);
-            const parser = this.parserFor(type);
-            const [loopPtr2, value] = parser(payloadData, loopPtr);
+            const [loopPtr2, value] = this.parserFor(type, payloadData, loopPtr);
             values.push(value);
             payloadData = payloadData.slice(loopPtr2);
         }
@@ -164,12 +176,11 @@ export class MessageParser {
             case 0:
                 compression = 'none';
                 break;
-            case 2:
+            case 1:
                 compression = 'zlib';
                 break;
             default:
                 throw new Error('invalid header');
-                break;
         }
         return [ptr3, { length, compression }];
     }
@@ -301,53 +312,53 @@ export class MessageParser {
 
     private time = this.longint;
 
-    private parserFor(t: ObjectType): (data: ArrayBuffer, ptr: number) => [number, WeeValue] {
+    private parserFor(t: ObjectType, data: ArrayBuffer, ptr: number): [number, WeeValue] {
         switch(t) {
             case 'array':
-                return (data, ptr) => this.map(
+                return this.map(
                     this.array(data, ptr),
                     values => ({ type: 'array', values }),
                 );
             case 'buffer':
-                return (data, ptr) => this.map(
+                return this.map(
                     this.buffer(data, ptr),
                     value => ({ type: 'buffer', value }),
                 );
             case 'char':
-                return (data, ptr) => this.map(
+                return this.map(
                     this.char(data, ptr),
                     value => ({ type: 'char', value }),
                 );
             case 'hash':
-                return this.hashtable;
+                return this.hashtable(data, ptr);
             case 'hdata':
-                return this.hdata;
+                return this.hdata(data, ptr);
             case 'info':
-                return this.info;
+                return this.info(data, ptr);
             case 'infolist':
-                return this.infolist;
+                return this.infolist(data, ptr);
             case 'int':
-                return (data, ptr) => this.map(
+                return this.map(
                     this.integer(data, ptr),
                     value => ({ type: 'int', value })
                 );
             case 'long':
-                return (data, ptr) => this.map(
+                return this.map(
                     this.longint(data, ptr),
                     value => ({ type: 'long', value })
                 );
             case 'pointer':
-                return (data, ptr) => this.map(
+                return this.map(
                     this.pointer(data, ptr),
                     value => ({ type: 'pointer', value })
                 );
             case 'string':
-                return (data, ptr) => this.map(
+                return this.map(
                     this.string(data, ptr),
                     value => ({ type: 'string', value })
                 );
             case 'time':
-                return (data, ptr) => this.map(
+                return this.map(
                     this.time(data, ptr),
                     value => ({ type: 'time', value })
                 );
@@ -361,14 +372,11 @@ export class MessageParser {
         const [ptr3, valueTy] = this.type(data, ptr2);
         const [ptr4, count] = this.integer(data, ptr3);
 
-        const keyPar = this.parserFor(keyTy);
-        const valuePar = this.parserFor(valueTy);
-
         var loopPtr = ptr4;
         const map = new Map<WeeValue, WeeValue>();
         for (var i = 0; i < count; i++) {
-            const [loopPtr2, key] = keyPar(data, loopPtr);
-            const [loopPtr3, value] = valuePar(data, loopPtr2);
+            const [loopPtr2, key] = this.parserFor(keyTy, data, loopPtr);
+            const [loopPtr3, value] = this.parserFor(valueTy, data, loopPtr2);
             map.set(key, value);
             loopPtr = loopPtr3;
         }
@@ -398,8 +406,7 @@ export class MessageParser {
             const entries = new Map<string, WeeValue>();
             keys.forEach(([key, val]) => {
                 if (isObjectType(val)) {
-                    const parser = this.parserFor(val);
-                    const [keysPtr, value] = parser(data, loopPtr);
+                    const [keysPtr, value] = this.parserFor(val, data, loopPtr);
                     entries.set(key, value);
                     loopPtr = keysPtr;
                 } else {
@@ -435,8 +442,7 @@ export class MessageParser {
             for (var j = 0; j < numVars; j++) {
                 const [varLoopPtr, varName] = this.string(data, loopPtr);
                 const [varLoopPtr2, varType] = this.type(data, varLoopPtr);
-                const parser = this.parserFor(varType);
-                const [varLoopPtr3, varValue] = parser(data, varLoopPtr2);
+                const [varLoopPtr3, varValue] = this.parserFor(varType, data, varLoopPtr2);
                 vars.set(varName, varValue);
                 loopPtr = varLoopPtr3;
             }
@@ -449,13 +455,12 @@ export class MessageParser {
 
     private array(data: ArrayBuffer, ptr: number): [number, WeeValue[]] {
         const [ptr2, type] = this.type(data, ptr);
-        const parser = this.parserFor(type);
         const [ptr3, count] = this.integer(data, ptr2);
 
         const values = [];
         var loopPtr = ptr3;
         for (var i = 0; i < count; i++) {
-            const [loopPtr2, value] = parser(data, loopPtr);
+            const [loopPtr2, value] = this.parserFor(type, data, loopPtr);
             values.push(value);
             loopPtr = loopPtr2;
         }
