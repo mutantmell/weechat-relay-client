@@ -2,11 +2,6 @@ import { Message, Weechat } from "../src/weechat";
 import * as HandshakeResponse from "../src/weechat/protocol/message/implicit/handshakeResponse";
 import * as Reference from '../src/weechat/protocol/command/reference';
 
-import * as rxjs from 'rxjs';
-import { map } from 'rxjs/operators';
-import { listenerCount } from "process";
-
-
 describe('weechat integration test', () => {
     function client() {
         return Weechat.make({
@@ -77,37 +72,43 @@ describe('weechat integration test', () => {
                                 password: {
                                     type: 'plain',
                                     value: "",
-                                }
-                            },
-                        }])
-                        // In real code, would be best to send version message to check if weechat is ready
-                        this.wc.send([{
-                            id: 'initial-buffer-request',
-                            command: {
-                                name: 'hdata',
-                                path: {
-                                    name: 'buffer',
-                                    pointer: Reference.parse('gui_buffers'),
-                                    count: '*',
                                 },
-                                keys: [
-                                    'local_variables',
-                                    'notify',
-                                    'number',
-                                    'full_name',
-                                    'short_name',
-                                    'title',
-                                    'hidden',
-                                    'type',
-                                ],
-                            },
-                        },{
-                            id: 'initial-sync-request',
-                            command: {
-                                name: 'sync',
-                                type: 'full',
                             },
                         }]);
+                        this.wc.send([{
+                            id: 'test',
+                            command: {
+                                name: 'test',
+                            },
+                        }]);
+                        // // In real code, would be best to send version message to check if weechat is ready
+                        // this.wc.send([{
+                        //     id: 'initial-buffer-request',
+                        //     command: {
+                        //         name: 'hdata',
+                        //         path: {
+                        //             name: 'buffer',
+                        //             pointer: Reference.parse('gui_buffers'),
+                        //             count: '*',
+                        //         },
+                        //         keys: [
+                        //             'local_variables',
+                        //             'notify',
+                        //             'number',
+                        //             'full_name',
+                        //             'short_name',
+                        //             'title',
+                        //             'hidden',
+                        //             'type',
+                        //         ],
+                        //     },
+                        // },{
+                        //     id: 'initial-sync-request',
+                        //     command: {
+                        //         name: 'sync',
+                        //         type: 'full',
+                        //     },
+                        // }]);
                     case ListenState.Ready:
                         return;
                 }
@@ -117,7 +118,7 @@ describe('weechat integration test', () => {
         const f = F.make(wc);
         f.init();
 
-        var [result, initResult] = await pr; 
+        var [result, initResult] = await pr;
 
         expect(result).toEqual({
             type: 'handshake_response',
@@ -126,7 +127,11 @@ describe('weechat integration test', () => {
             totp: false,
             nonce: result.nonce, // randomly generated
             compression: 'zlib',
-        })
+        });
+
+        expect(initResult).toEqual({
+            'todo': 'fill-in',
+        });
 
         wc.close();
     })
