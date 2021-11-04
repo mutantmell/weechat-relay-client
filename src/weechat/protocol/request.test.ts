@@ -65,7 +65,7 @@ describe('init serialization', () => {
         const request: Request.Request = {
             command: {
                 name: 'init',
-                password: { type: 'password', password: 'mypass', },
+                password: { type: 'plain', value: 'mypass', },
             },
         };
 
@@ -78,7 +78,7 @@ describe('init serialization', () => {
         const request: Request.Request = {
             command: {
                 name: 'init',
-                password: { type: 'password', password: 'mypass,with,commas', },
+                password: { type: 'plain', value: 'mypass,with,commas', },
             },
         };
 
@@ -91,7 +91,7 @@ describe('init serialization', () => {
         const request: Request.Request = {
             command: {
                 name: 'init',
-                password: { type: 'password', password: 'mypass', },
+                password: { type: 'plain', value: 'mypass', },
                 totp: '123456',
             },
         };
@@ -106,7 +106,7 @@ describe('init serialization', () => {
             command: {
                 name: 'init',
                 password: {
-                    type: 'password_hash',
+                    type: 'hash',
                     encryption: Encryption.algo.sha256,
                     salt: '85b1ee00695a5b254e14f4885538df0da4b73207f5aae4', // `${relay_nonce}${client_nonce}`
                     hash: '2c6ed12eb0109fca3aedc03bf03d9b6e804cd60a23e1731fd17794da423e21db', // password: test
@@ -124,7 +124,7 @@ describe('init serialization', () => {
             command: {
                 name: 'init',
                 password: {
-                    type: 'password_hash',
+                    type: 'hash',
                     encryption: Encryption.algo.sha512,
                     salt: '85b1ee00695a5b254e14f4885538df0da4b73207f5aae4', // `${relay_nonce}${client_nonce}`
                     hash: '0a1f0172a542916bd86e0cbceebc1c38ed791f6be246120452825f0d74ef1078c79e9812de8b0ab3dfaf598b6ca14522374ec6a8653a46df3f96a6b54ac1f0f8',  // password: test
@@ -142,7 +142,7 @@ describe('init serialization', () => {
             command: {
                 name: 'init',
                 password: {
-                    type: 'password_key_hash',
+                    type: 'key_hash',
                     encryption: Encryption.algo['sha256-pbkdf2'],
                     salt: '85b1ee00695a5b254e14f4885538df0da4b73207f5aae4', // `${relay_nonce}${client_nonce}`
                     iterations: 100000,

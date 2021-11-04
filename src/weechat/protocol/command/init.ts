@@ -1,19 +1,19 @@
 import * as Encryption from "./encryption";
 
 export interface PasswordPlain {
-    type: 'password';
-    password: string;
+    type: 'plain';
+    value: string;
 }
 
 export interface PasswordHash {
-    type: 'password_hash';
+    type: 'hash';
     encryption: Encryption.HashEncryption;
     salt: string;
     hash: string;
 }
 
 export interface PasswordKeyHash {
-    type: 'password_key_hash';
+    type: 'key_hash';
     encryption: Encryption.HashKeyEncryption;
     salt: string;
     hash: string;
@@ -39,17 +39,17 @@ function escape(s: string): string {
 export function format(i: Init): string {
     const args = [];
     switch (i.password.type) {
-        case 'password':
-            args.push(`password=${escape(i.password.password)}`);
+        case 'plain':
+            args.push(`password=${escape(i.password.value)}`);
             break;
-        case 'password_hash':
+        case 'hash':
             args.push('password_hash=' + [
                 Encryption.format(i.password.encryption),
                 i.password.salt,
                 i.password.hash
             ].join(':'));
             break;
-        case 'password_key_hash':
+        case 'key_hash':
             args.push('password_hash=' + [
                 Encryption.format(i.password.encryption),
                 i.password.salt,
