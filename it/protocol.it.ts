@@ -17,9 +17,11 @@ describe('weechat integration test', () => {
             var hr: HandshakeResponse.HandshakeResponse = null;
             const msgs: Message[] = [];
             wc.register(msg => {
-                if (msgs.length === 0) {
+                if (hr === null) {
+                    console.log("hrm1");
                     hr = HandshakeResponse.parse(msg)
                 } else {
+                    console.log("hrm2");
                     res([hr, msg]);
                 }
             })
@@ -44,7 +46,7 @@ describe('weechat integration test', () => {
 
             public static make(wc: Weechat) {
                 const f = new F(wc, ListenState.Ready);
-                wc.register(f.listener);
+                wc.register(msg => f.listener(msg))
                 return f;
             }
 

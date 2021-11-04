@@ -205,7 +205,8 @@ export class MessageParser {
 
     private type(data: ArrayBuffer, ptr: number): [number, ObjectType] {
         var type: ObjectType;
-        switch (this.decode(data.slice(ptr, ptr + 3))) {
+        const typ = this.decode(data.slice(ptr, ptr + 3));
+        switch (typ) {
             case 'chr':
                 type = 'char';
                 break;
@@ -243,7 +244,7 @@ export class MessageParser {
                 type = 'array';
                 break;
             default:
-                throw new Error(`invalid type: ${type}`)
+                throw new Error(`invalid type: ${typ}`)
         }
         return [
             ptr + 3,
@@ -271,7 +272,7 @@ export class MessageParser {
                 break;
         }
         return [
-            ptr2 + len,
+            ptr2 + Math.max(0, len),
             data,
         ];
     }
