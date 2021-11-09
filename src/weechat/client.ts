@@ -4,7 +4,8 @@ import * as WebSocket from 'ws';
 
 export interface Config {
     url: string,
-    port: number
+    port: number,
+    ssl: boolean,
 }
 
 export class Weechat {
@@ -21,7 +22,7 @@ export class Weechat {
     public static make(config: Config): Weechat {
         const messages = [];
         const ws = new WebSocket(
-            `ws://${config.url}:${config.port}/weechat`
+            `${config.ssl ? 'wss' : 'ws'}://${config.url}:${config.port}/weechat`
         );
         ws.binaryType = 'arraybuffer';
         ws.onopen = () => {

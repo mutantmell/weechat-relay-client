@@ -6,7 +6,8 @@ describe('weechat integration test', () => {
     function client() {
         return Weechat.make({
             url: "localhost",
-            port: 9000
+            port: 9000,
+            ssl: false,
         });
     } 
 
@@ -18,10 +19,8 @@ describe('weechat integration test', () => {
             const msgs: Message[] = [];
             wc.register(msg => {
                 if (hr === null) {
-                    console.log("hrm1");
                     hr = HandshakeResponse.parse(msg)
                 } else {
-                    console.log("hrm2");
                     res([hr, msg]);
                 }
             })
